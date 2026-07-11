@@ -1,16 +1,150 @@
-## Hi there 👋
+# 이동근 (Dongkeun Lee)
 
-<!--
-**dongkeun99/dongkeun99** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+### 모르는 자리에서 가장 먼저 손을 드는 개발자 이동근입니다.
 
-Here are some ideas to get you started:
+기계공학에서 출발해 스스로 진로를 바꿨습니다.
+그렇게 자원한 자리에서 HTML을 처음 배웠고, 부트캠프 두 프로젝트에서 1위를 했으며, 지금은 백엔드를 맡고 있습니다.
+화면만 만드는 개발자보다 **데이터가 어디서 와서 어떻게 흐르는지 아는 개발자**가 되려 합니다.
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+📄 **[포트폴리오 PDF 보기](./포트폴리오_이동근.pdf)** · ✉️ mark6896@naver.com
+
+---
+
+## 🛠 Tech Stack
+
+| 분류 | 기술 |
+|---|---|
+| **Frontend** | `TypeScript` `JavaScript(ES6+)` `React` `Next.js (App Router)` `Tailwind CSS` |
+| **Backend / Data** | `Supabase` `PostgreSQL` `DB Trigger` `Realtime` |
+| **Tools** | `Git` `GitHub` `Vercel` `Figma` `Claude Code` `Codex` |
+
+생성된 코드를 그대로 두지 않고, **왜 그렇게 동작하는지 확인한 뒤 반영하는 것**을 기준으로 삼습니다.
+속도는 도구에서 얻되, 판단은 스스로 합니다.
+
+---
+
+## 📦 Kanto — 필리핀 생활 필수 플랫폼
+
+> 중고거래 · 구인구직 · 부동산을 한 곳에서 다루는 커뮤니티 서비스
+> 멋쟁이사자처럼 부트캠프 파이널 프로젝트 · **팀 평가 1위**
+
+[![Demo](https://img.shields.io/badge/Demo-kanto--iota.vercel.app-0F766E?style=flat-square)](https://kanto-iota.vercel.app/main)
+[![Code](https://img.shields.io/badge/Code-GitHub-181717?style=flat-square&logo=github)](https://github.com/FRONTENDBOOTCAMP-17th/kanto)
+
+`Next.js` `TypeScript` `Supabase` `Tailwind CSS` · 프론트엔드 4인 · 2026.05 ~ 2026.07
+
+### 담당한 것
+
+| 파트 | 내용 |
+|---|---|
+| **회원가입** `/signup` | 폼 상태 관리 및 유효성 검증, Supabase 인증 연동, 가입 시 회원 정보 자동 생성 트리거 |
+| **중고물품 상세** `/usedgoods/[id]` | 이미지 캐러셀, Realtime 기반 실시간 좋아요, 신고 모달, 작성자 전용 수정·삭제 |
+| **관리자 회원 관리** `/admin/users` | 서버·클라이언트 컴포넌트 분리, 반응형 UI(테이블형/카드형), 페이지네이션 공통 컴포넌트 |
+| **부동산 등록** `/rental/create` | 다단계 입력 폼, posts–rentals 2단계 저장 구조 설계 |
+| **유지보수** | 그 외 다수 페이지의 에러·버그 수정 |
+
+### 담당 파트의 데이터 구조
+
+```
+auth.users  (Supabase 인증)
+    │
+    │  Trigger — 가입 시 자동 생성
+    ▼
+public.users  ── auth_id 로 연결
+    │
+    │  user_id
+    ▼
+  posts  (게시글 공통 정보)
+    ├──▶ usedgoods  (중고물품 고유 정보)
+    │       ▲
+    │       │ Trigger — likes 추가·삭제 시 like_count 자동 갱신
+    │     likes
+    │
+    └──▶ rentals    (부동산 고유 정보 · 2단계 저장)
+```
+
+### 기억에 남는 문제 해결
+
+<details>
+<summary><b>회원가입은 성공하는데, 서비스 회원 정보가 저장되지 않던 문제</b></summary>
+
+<br>
+
+Supabase는 인증 정보를 `auth.users`에, 서비스 프로필을 `public.users`에 따로 보관합니다.
+가입은 되는데 서비스 회원이 생기지 않아 원인을 파고들자 **세 겹으로 겹쳐** 있었습니다.
+
+1. 두 테이블을 이어주는 **트리거가 없었음**
+2. `public.users.id`에 자동 증가 기본값이 없어 **NOT NULL 위반**
+3. 결정적으로, **트리거 함수가 에러를 던지면 `auth.users` 삽입까지 함께 롤백**되어 회원가입 자체가 실패
+
+세 번째 원인은 에러 메시지에 드러나지 않아, 한 겹씩 벗겨내며 직접 찾아야 했습니다.
+
+**해결** — 가입 시 `public.users`에 회원을 자동 생성하는 트리거 함수를 작성했습니다.
+시퀀스로 `id`를 채우고, `auth_id`로 인증 계정과 서비스 프로필을 연결하고, 중복 가입은 무시하도록 했습니다.
+무엇보다 **함수 전체를 예외 처리로 감싸**, 프로필 생성이 실패해도 인증 정보는 남도록 만들었습니다.
+
+**결과** — 여기서 만든 `auth_id` 연결 규칙은 이후 관리자 회원 관리와 부동산 등록에서
+회원을 식별하는 기준으로 그대로 재사용되었습니다.
+
+</details>
+
+<details>
+<summary><b>좋아요를 누를 때마다 전체 개수를 세던 비효율</b></summary>
+
+<br>
+
+좋아요 수를 표시하려면 매번 좋아요 테이블 전체를 `count` 조회해야 했고,
+목록에 카드가 늘어날수록 조회가 그만큼 반복되는 구조였습니다.
+
+**해결** — 게시글 테이블에 `like_count` 컬럼을 두고, 좋아요 추가·삭제 시 값을 자동 갱신하는 **DB Trigger**를 작성했습니다.
+애플리케이션이 아니라 **DB가 정합성을 책임지게** 해, 어느 경로로 변경되든 수치가 어긋나지 않도록 했습니다.
+
+**결과** — 조회는 컬럼 하나를 읽는 것으로 끝나고, Realtime 구독과 결합해
+다른 사용자의 좋아요가 새로고침 없이 즉시 반영됩니다.
+
+</details>
+
+<details>
+<summary><b>게시글과 임대 정보를 어떻게 나눠 저장할 것인가</b></summary>
+
+<br>
+
+부동산 글에는 제목·이미지처럼 **모든 게시글의 공통 정보**와,
+보증금·방 타입·편의시설처럼 **부동산에만 있는 정보**가 섞여 있었습니다.
+한 테이블에 전부 넣으면 중고거래·구인구직 글에는 빈 칸만 늘어납니다.
+
+**해결** — 공통 정보는 `posts`, 부동산 고유 정보는 `rentals`로 분리하고,
+`posts`를 먼저 저장해 얻은 식별자로 `rentals`를 저장하는 **2단계 저장 구조**를 설계했습니다.
+
+**결과** — 게시글 종류가 늘어나도 공통 구조를 재사용할 수 있게 되었고,
+삭제 시 연결된 데이터도 함께 정리되도록 처리했습니다.
+
+</details>
+
+---
+
+## 🌱 또랑 — AI 쉬운 정보 서비스 (해커톤)
+
+> 느린학습자 · 경계선 지능인을 위해 어려운 정보를 쉬운 말로 바꿔주는 AI 서비스
+> **기획서 제출 완료 · 심사 대기 중** (개발 착수 전)
+
+프론트엔드가 익숙하지만, 이번에는 **백엔드(Server)를 자원**했습니다.
+파이널 프로젝트에서 Supabase를 다루며 *화면은 결국 데이터가 흐른 결과일 뿐*이라는 걸 체감했기 때문입니다.
+
+**대상자 분류 알고리즘 설계** — 사용자의 이해 수준을 3단계로 나누는 기준을 설계했습니다.
+
+- 절단점수(cut-off) 기반 구간 설정
+- 측정표준오차(SEM)를 반영한 경계 보정
+- 애매한 구간은 더 쉬운 단계로 배정하는 **보수적 규칙** — 어려운 설명을 받아 이해하지 못하는 위험이, 쉬운 설명을 받는 불편보다 크다고 판단
+
+기능을 짜기 전에 **"무엇이 옳은 분류인가"를 먼저 정의해야 한다**는 것을 배운 과정이었습니다.
+
+---
+
+## 📚 Background
+
+| | |
+|---|---|
+| **원광대학교** | 컴퓨터·소프트웨어공학과 · 2025.08 졸업 (3학년 편입 · 평점 3.61) |
+| **멋쟁이사자처럼** | 프론트엔드 부트캠프 · 2026.01 ~ 2026.07 · **팀 프로젝트 1위 2회 · 우수상(수강생 중 4인)** |
+| **자격** | 정보처리기사 (2025) |
