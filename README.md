@@ -6,7 +6,7 @@
 그렇게 자원한 자리에서 HTML을 처음 배웠고, 부트캠프 두 프로젝트에서 1위를 했으며, 지금은 백엔드를 맡고 있습니다.
 화면만 만드는 개발자보다 **데이터가 어디서 와서 어떻게 흐르는지 아는 개발자**가 되려 합니다.
 
-📄 **[포트폴리오 PDF 보기](https://github.com/dongkeun99/dongkeun99/blob/main/portfolio.pdf)** · ✉️ <mark6896@naver.com>
+📄 **[포트폴리오 PDF 보기](./Portfolio.pdf)** · ✉️ <mark6896@naver.com>
 
 ---
 
